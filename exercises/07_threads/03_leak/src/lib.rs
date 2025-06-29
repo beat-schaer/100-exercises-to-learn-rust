@@ -3,10 +3,19 @@
 //  sum each half in a separate thread.
 //  Hint: check out `Vec::leak`.
 
-use std::thread;
+use std::thread::spawn;
+
+fn sum_half(s: &[i32]) -> i32 {
+    s.iter().sum()
+}
 
 pub fn sum(v: Vec<i32>) -> i32 {
-    todo!()
+    let leaked_v = v.leak();
+    let split_idx = leaked_v.len() / 2;
+    let (first_half, second_half) = leaked_v.split_at(split_idx);
+    let first_result = spawn(|| sum_half(first_half));
+    let second_result = spawn(|| sum_half(second_half));
+    first_result.join().unwrap() + second_result.join().unwrap()
 }
 
 #[cfg(test)]

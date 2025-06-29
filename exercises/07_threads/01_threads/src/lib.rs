@@ -12,10 +12,19 @@
 // slices of the vector directly. You'll need to allocate new
 // vectors for each half of the original vector. We'll see why
 // this is necessary in the next exercise.
-use std::thread;
+use std::thread::spawn;
+
+fn sum_half(s: Vec<i32>) -> i32 {
+    s.iter().sum()
+}
 
 pub fn sum(v: Vec<i32>) -> i32 {
-    todo!()
+    let (first_half, second_half) = v.split_at(v.len() / 2);
+    let first_half = first_half.to_vec();
+    let second_half = second_half.to_vec();
+    let result_1 = spawn(|| sum_half(first_half) );
+    let result_2 = spawn(|| sum_half(second_half) );
+    result_1.join().unwrap() + result_2.join().unwrap()
 }
 
 #[cfg(test)]
